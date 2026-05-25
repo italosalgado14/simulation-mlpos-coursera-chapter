@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Algorithm Design Techniques — a visual guide</title>
+<meta name="description" content="A visual guide to the major algorithm design techniques: brute force, decrease & conquer, divide & conquer, transform & conquer, greedy, dynamic programming, backtracking, branch & bound, randomized and approximation algorithms." />
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface-2: #20242f;
+    --text: #e6e8ee;
+    --muted: #9aa3b2;
+    --accent: #5b9dff;
+    --accent-2: #7ee0a9;
+    --border: #2a2f3c;
+    --code-bg: #11141c;
+    --max: 880px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 17px;
+  }
+  .pagenav {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10; font-size: 0.9rem;
+  }
+  .pagenav a { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .pagenav a.active { color: #fff; border-color: var(--accent); background: rgba(91,157,255,0.12); }
+  .pagenav a:hover { text-decoration: none; color: var(--text); }
+  header.hero {
+    background: linear-gradient(135deg, #1b2436 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 24px 44px;
+    text-align: center;
+  }
+  header.hero h1 { margin: 0 0 12px; font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.02em; }
+  header.hero p { margin: 0 auto; max-width: 640px; color: var(--muted); font-size: 1.05rem; }
+  .badge {
+    display: inline-block; margin-bottom: 20px; padding: 4px 12px;
+    border: 1px solid var(--border); border-radius: 999px; font-size: 0.78rem;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-2);
+  }
+  main { max-width: var(--max); margin: 0 auto; padding: 0 24px 80px; }
+  nav.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin: 40px 0; }
+  nav.toc h2 { margin: 0 0 12px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+  nav.toc li { margin: 4px 0; break-inside: avoid; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  section { margin: 52px 0; }
+  h2 { font-size: 1.5rem; margin: 0 0 8px; padding-top: 12px; letter-spacing: -0.01em; }
+  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 10px; }
+  h3 { font-size: 1.1rem; margin: 26px 0 6px; color: var(--accent-2); }
+  p { margin: 12px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; }
+  strong { color: #fff; }
+  blockquote { margin: 20px 0; padding: 12px 18px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; color: var(--muted); }
+  .callout { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin: 20px 0; }
+  .callout.warn { border-color: #5c4a2a; background: #221d12; }
+  .callout.tip { border-color: #2a5c41; background: #122019; }
+  .callout.lab { border-color: #2a3f5c; background: #121b25; }
+  .callout h4 { margin: 0 0 6px; font-size: 0.95rem; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.93rem; border-radius: 10px; overflow: hidden; }
+  th, td { padding: 10px 13px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); color: #fff; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code { background: var(--code-bg); padding: 2px 6px; border-radius: 5px; font-size: 0.88em; color: var(--accent-2); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.78rem; border:1px solid var(--border); background:var(--surface-2); color:var(--muted); margin-right:6px; }
+  .svg-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin: 24px 0; text-align: center; }
+  .svg-wrap figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 10px; }
+  svg { max-width: 100%; height: auto; }
+  .svg-wrap text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .nextlink { display:block; margin: 28px 0; padding: 16px 20px; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+</style>
+</head>
+<body>
+
+<div class="pagenav">
+  <a href="index.html">① Problem Framing</a>
+  <a href="algorithm-design.html" class="active">② Algorithm Design Techniques</a>
+</div>
+
+<header class="hero">
+  <span class="badge">Foundations · Part 2</span>
+  <h1>Algorithm Design Techniques</h1>
+  <p>A design technique is a general strategy for building an algorithm. Knowing the handful of classic strategies lets you recognize a new problem as a variation of one you already know how to solve.</p>
+</header>
+
+<main>
+
+  <nav class="toc">
+    <h2>The techniques</h2>
+    <ol>
+      <li><a href="#map">The big picture</a></li>
+      <li><a href="#brute">Brute force &amp; exhaustive search</a></li>
+      <li><a href="#decrease">Decrease &amp; conquer</a></li>
+      <li><a href="#divide">Divide &amp; conquer</a></li>
+      <li><a href="#transform">Transform &amp; conquer</a></li>
+      <li><a href="#greedy">Greedy</a></li>
+      <li><a href="#dp">Dynamic programming</a></li>
+      <li><a href="#backtracking">Backtracking</a></li>
+      <li><a href="#bnb">Branch &amp; bound</a></li>
+      <li><a href="#randomized">Randomized algorithms</a></li>
+      <li><a href="#approx">Approximation &amp; heuristics</a></li>
+      <li><a href="#choose">How to choose</a></li>
+      <li><a href="#labs">Tie-in to this repo</a></li>
+    </ol>
+  </nav>
+
+  <section id="map">
+    <h2><span class="num">§</span>The big picture</h2>
+    <p>Most algorithms you'll ever write are an instance of one of about ten strategies. They differ in <strong>how they break a problem down</strong> and <strong>how much work they repeat or avoid</strong>. Here's the whole landscape on one table — the rest of the page expands each row.</p>
+    <table>
+      <tr><th>Technique</th><th>Core idea</th><th>Best when</th><th>Classic examples</th><th>Typical cost</th></tr>
+      <tr><td><strong>Brute force</strong></td><td>Try every possibility</td><td>Small input; need a baseline</td><td>Linear search, naïve TSP</td><td>often <code>O(2ⁿ)</code>/<code>O(n!)</code></td></tr>
+      <tr><td><strong>Decrease &amp; conquer</strong></td><td>Shrink to one smaller instance</td><td>Solving size <em>n</em> reduces cleanly to <em>n−1</em> or <em>n/2</em></td><td>Binary search, insertion sort, DFS</td><td><code>O(log n)</code>–<code>O(n²)</code></td></tr>
+      <tr><td><strong>Divide &amp; conquer</strong></td><td>Split into <em>independent</em> subproblems, combine</td><td>Subproblems don't overlap</td><td>Merge sort, quicksort, FFT</td><td>often <code>O(n log n)</code></td></tr>
+      <tr><td><strong>Transform &amp; conquer</strong></td><td>Convert to an easier representation first</td><td>A better data structure / form exists</td><td>Heapsort, presorting, Gaussian elim.</td><td>varies</td></tr>
+      <tr><td><strong>Greedy</strong></td><td>Take the locally best choice, never undo</td><td>Greedy-choice property holds</td><td>Dijkstra, Huffman, Kruskal</td><td>often <code>O(n log n)</code></td></tr>
+      <tr><td><strong>Dynamic programming</strong></td><td>Solve overlapping subproblems once, store results</td><td>Overlap + optimal substructure</td><td>Knapsack, edit distance, LCS</td><td>often <code>O(n·W)</code> etc.</td></tr>
+      <tr><td><strong>Backtracking</strong></td><td>Build candidates; abandon dead ends early</td><td>Search for valid configurations</td><td>N-Queens, Sudoku, subset sum</td><td>exponential, pruned</td></tr>
+      <tr><td><strong>Branch &amp; bound</strong></td><td>Backtracking + bounds to cut hopeless branches</td><td>Hard optimization problems</td><td>TSP, 0/1 knapsack (optimal)</td><td>exponential, pruned</td></tr>
+      <tr><td><strong>Randomized</strong></td><td>Use random choices</td><td>Average-case speed or sampling</td><td>Randomized quicksort, Monte Carlo</td><td>varies</td></tr>
+      <tr><td><strong>Approximation</strong></td><td>Accept "good enough", fast</td><td>NP-hard; optimum too costly</td><td>TSP 2-approx, set cover</td><td>polynomial</td></tr>
+    </table>
+  </section>
+
+  <section id="brute">
+    <h2><span class="num">1</span>Brute force &amp; exhaustive search</h2>
+    <p>Generate <strong>every</strong> candidate solution and check each one. Simple, always correct, and almost always too slow for large inputs — but it's the honest baseline every other technique is measured against.</p>
+    <ul>
+      <li><strong>Examples:</strong> linear search, selection &amp; bubble sort, naïve substring matching, trying all <code>n!</code> city orders in the Travelling Salesman Problem (TSP), password cracking.</li>
+      <li><strong>Cost:</strong> grows explosively — subsets are <code>O(2ⁿ)</code>, permutations <code>O(n!)</code>.</li>
+    </ul>
+    <div class="callout tip">
+      <h4>Why it still matters</h4>
+      <p>For small <em>n</em>, brute force is the <em>right</em> choice — it's simple and bug-resistant. And writing it first gives you a correct reference to test your clever algorithm against.</p>
+    </div>
+  </section>
+
+  <section id="decrease">
+    <h2><span class="num">2</span>Decrease &amp; conquer</h2>
+    <p>Reduce the problem to a <strong>single</strong> smaller instance, solve that, then extend the solution. The link between the problem and its sub-instance is exploited top-down or bottom-up.</p>
+    <table>
+      <tr><th>Variant</th><th>How much you decrease</th><th>Example</th></tr>
+      <tr><td>By a constant</td><td><em>n → n−1</em></td><td>Insertion sort, DFS/BFS</td></tr>
+      <tr><td>By a constant factor</td><td><em>n → n/2</em></td><td>Binary search, exponentiation by squaring</td></tr>
+      <tr><td>By a variable amount</td><td>depends on the data</td><td>Euclid's GCD, quickselect</td></tr>
+    </table>
+    <p>Binary search is the poster child: each step throws away half the remaining data, giving <code>O(log n)</code>.</p>
+  </section>
+
+  <section id="divide">
+    <h2><span class="num">3</span>Divide &amp; conquer</h2>
+    <p>Split the problem into <strong>several independent</strong> subproblems of the same kind, solve each recursively, then <strong>combine</strong> their answers. The subproblems must <em>not</em> overlap — that's what separates this from dynamic programming.</p>
+
+    <figure class="svg-wrap">
+      <svg viewBox="0 0 680 290" role="img" aria-label="Divide and conquer recursion tree">
+        <!-- edges -->
+        <g stroke="#43506b" stroke-width="2">
+          <line x1="340" y1="52" x2="180" y2="100"/>
+          <line x1="340" y1="52" x2="500" y2="100"/>
+          <line x1="180" y1="128" x2="100" y2="176"/>
+          <line x1="180" y1="128" x2="260" y2="176"/>
+          <line x1="500" y1="128" x2="420" y2="176"/>
+          <line x1="500" y1="128" x2="580" y2="176"/>
+        </g>
+        <!-- nodes -->
+        <g>
+          <rect x="300" y="24" width="80" height="28" rx="6" fill="#20242f" stroke="#5b9dff"/>
+          <text x="340" y="43" fill="#e6e8ee" text-anchor="middle" font-size="14">size n</text>
+
+          <rect x="140" y="100" width="80" height="28" rx="6" fill="#20242f" stroke="#5b9dff"/>
+          <text x="180" y="119" fill="#e6e8ee" text-anchor="middle" font-size="14">n/2</text>
+          <rect x="460" y="100" width="80" height="28" rx="6" fill="#20242f" stroke="#5b9dff"/>
+          <text x="500" y="119" fill="#e6e8ee" text-anchor="middle" font-size="14">n/2</text>
+
+          <rect x="64" y="176" width="72" height="28" rx="6" fill="#20242f" stroke="#7ee0a9"/>
+          <text x="100" y="195" fill="#e6e8ee" text-anchor="middle" font-size="13">n/4</text>
+          <rect x="224" y="176" width="72" height="28" rx="6" fill="#20242f" stroke="#7ee0a9"/>
+          <text x="260" y="195" fill="#e6e8ee" text-anchor="middle" font-size="13">n/4</text>
+          <rect x="384" y="176" width="72" height="28" rx="6" fill="#20242f" stroke="#7ee0a9"/>
+          <text x="420" y="195" fill="#e6e8ee" text-anchor="middle" font-size="13">n/4</text>
+          <rect x="544" y="176" width="72" height="28" rx="6" fill="#20242f" stroke="#7ee0a9"/>
+          <text x="580" y="195" fill="#e6e8ee" text-anchor="middle" font-size="13">n/4</text>
+        </g>
+        <!-- side labels -->
+        <text x="20" y="92" fill="#9aa3b2" font-size="13">divide ↓</text>
+        <text x="600" y="92" fill="#9aa3b2" font-size="13">combine ↑</text>
+        <text x="340" y="250" fill="#9aa3b2" text-anchor="middle" font-size="13">…down to base cases, then merge results back up…</text>
+        <text x="340" y="272" fill="#7ee0a9" text-anchor="middle" font-size="13">e.g. Merge Sort: split in half, sort each, merge → O(n log n)</text>
+      </svg>
+      <figcaption>Divide &amp; conquer recursion tree. Each level splits the work; the answers merge back on the way up.</figcaption>
+    </figure>
+
+    <ul>
+      <li><strong>Examples:</strong> merge sort, quicksort, binary tree traversals, Karatsuba multiplication, Strassen's matrix multiply, the Fast Fourier Transform.</li>
+      <li><strong>Cost:</strong> often analysed with the <em>Master Theorem</em>; many give <code>O(n log n)</code>.</li>
+    </ul>
+  </section>
+
+  <section id="transform">
+    <h2><span class="num">4</span>Transform &amp; conquer</h2>
+    <p>First <strong>transform</strong> the instance into something easier to work with, then solve. Three flavours:</p>
+    <ul>
+      <li><strong>Instance simplification</strong> — e.g. <em>pre-sort</em> the data so the real work becomes trivial (finding duplicates, closest pair).</li>
+      <li><strong>Representation change</strong> — store data in a smarter structure: heaps (heapsort), balanced BSTs, hash tables.</li>
+      <li><strong>Problem reduction</strong> — convert problem A into a solved problem B, e.g. <code>lcm(a,b) = a·b / gcd(a,b)</code>, or modelling something as a graph/flow problem.</li>
+    </ul>
+  </section>
+
+  <section id="greedy">
+    <h2><span class="num">5</span>Greedy</h2>
+    <p>Build the solution step by step, always taking the choice that looks best <strong>right now</strong>, and <strong>never reconsidering</strong>. Fast and simple — but only correct when the problem has the <em>greedy-choice property</em> and <em>optimal substructure</em>.</p>
+    <ul>
+      <li><strong>Works (provably optimal):</strong> Dijkstra's shortest paths, Huffman coding, Kruskal/Prim minimum spanning trees, activity selection, coin change for <em>canonical</em> coin systems (like US coins).</li>
+      <li><strong>Fails:</strong> 0/1 knapsack, and coin change for arbitrary denominations — locally best ≠ globally best.</li>
+    </ul>
+    <div class="callout lab">
+      <h4>In this repo</h4>
+      <p><code>greedy_coin.py</code> takes the biggest coin that fits, repeatedly. For US coins that's optimal; change the denominations and the same greedy code can return too many coins — a perfect illustration of greedy's limits.</p>
+    </div>
+  </section>
+
+  <section id="dp">
+    <h2><span class="num">6</span>Dynamic programming</h2>
+    <p>When subproblems <strong>overlap</strong> (the same sub-question is asked many times), solve each one <strong>once</strong> and store the answer. Requires <em>overlapping subproblems</em> + <em>optimal substructure</em>.</p>
+    <table>
+      <tr><th>Style</th><th>Direction</th><th>How</th></tr>
+      <tr><td>Memoization</td><td>Top-down</td><td>Recurse, but cache each result the first time you compute it.</td></tr>
+      <tr><td>Tabulation</td><td>Bottom-up</td><td>Fill a table from the smallest subproblems upward.</td></tr>
+    </table>
+    <p>Naïve recursive Fibonacci recomputes <code>fib(2)</code> exponentially many times — <code>O(2ⁿ)</code>. DP computes each <code>fib(k)</code> once — <code>O(n)</code>.</p>
+    <pre>fib(5)
+├─ fib(4)
+│  ├─ fib(3)
+│  │  ├─ fib(2) ← recomputed
+│  │  └─ fib(1)
+│  └─ fib(2) ← recomputed again!
+└─ fib(3) ← and again…   →  DP stores each value once</pre>
+    <p><strong>Examples:</strong> 0/1 knapsack, longest common subsequence, edit (Levenshtein) distance, matrix-chain multiplication, Bellman-Ford &amp; Floyd-Warshall shortest paths.</p>
+    <div class="callout">
+      <h4>Greedy vs DP vs Divide &amp; conquer — in one line</h4>
+      <p><strong>Divide &amp; conquer:</strong> subproblems are independent. <strong>DP:</strong> subproblems overlap, so cache them. <strong>Greedy:</strong> never even look back — one pass of local choices.</p>
+    </div>
+  </section>
+
+  <section id="backtracking">
+    <h2><span class="num">7</span>Backtracking</h2>
+    <p>Build a solution one decision at a time, exploring a <strong>state-space tree</strong>. The moment a partial solution can't possibly become valid, <strong>prune</strong> it and back up. This avoids exploring the full brute-force space.</p>
+
+    <figure class="svg-wrap">
+      <svg viewBox="0 0 680 300" role="img" aria-label="Backtracking state-space tree with pruning">
+        <g stroke="#43506b" stroke-width="2" fill="none">
+          <line x1="340" y1="44" x2="180" y2="110"/>
+          <line x1="340" y1="44" x2="340" y2="110"/>
+          <line x1="340" y1="44" x2="500" y2="110"/>
+          <line x1="340" y1="138" x2="290" y2="200"/>
+          <line x1="340" y1="138" x2="400" y2="200"/>
+          <line x1="400" y1="228" x2="400" y2="262" stroke="#7ee0a9"/>
+        </g>
+        <!-- pruned edges (dashed red) -->
+        <g stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4" fill="none" opacity="0.8">
+          <line x1="180" y1="110" x2="180" y2="150"/>
+          <line x1="500" y1="110" x2="500" y2="150"/>
+          <line x1="290" y1="200" x2="290" y2="236"/>
+        </g>
+        <!-- root -->
+        <circle cx="340" cy="32" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <text x="340" y="37" fill="#e6e8ee" text-anchor="middle" font-size="12">start</text>
+        <!-- level 1 -->
+        <circle cx="180" cy="124" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <circle cx="340" cy="124" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <circle cx="500" cy="124" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <text x="180" y="166" fill="#ff6b6b" text-anchor="middle" font-size="18">✗</text>
+        <text x="500" y="166" fill="#ff6b6b" text-anchor="middle" font-size="18">✗</text>
+        <!-- level 2 -->
+        <circle cx="290" cy="214" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <circle cx="400" cy="214" r="14" fill="#20242f" stroke="#5b9dff"/>
+        <text x="290" y="252" fill="#ff6b6b" text-anchor="middle" font-size="18">✗</text>
+        <!-- solution -->
+        <circle cx="400" cy="276" r="14" fill="#122019" stroke="#7ee0a9"/>
+        <text x="400" y="281" fill="#7ee0a9" text-anchor="middle" font-size="14">✓</text>
+        <!-- legend -->
+        <text x="40" y="276" fill="#ff6b6b" font-size="13">✗ pruned (dead end)</text>
+        <text x="40" y="296" fill="#7ee0a9" font-size="13">✓ valid solution</text>
+      </svg>
+      <figcaption>A state-space tree. Dashed red branches are abandoned as soon as they can't lead to a valid solution; only the green path survives.</figcaption>
+    </figure>
+
+    <p><strong>Examples:</strong> N-Queens, Sudoku solvers, generating permutations/combinations, the subset-sum problem, graph colouring, maze solving.</p>
+  </section>
+
+  <section id="bnb">
+    <h2><span class="num">8</span>Branch &amp; bound</h2>
+    <p>Backtracking's cousin for <strong>optimization</strong> problems. As you explore, you keep the best complete solution found so far and compute a <strong>bound</strong> (best possible value) for each branch. If a branch's bound can't beat the current best, discard the entire branch unexplored.</p>
+    <ul>
+      <li><strong>Examples:</strong> exact TSP, 0/1 knapsack (for the true optimum), integer linear programming, assignment problems.</li>
+      <li><strong>Difference from backtracking:</strong> backtracking prunes branches that are <em>invalid</em>; branch &amp; bound also prunes branches that are <em>valid but provably suboptimal</em>.</li>
+    </ul>
+  </section>
+
+  <section id="randomized">
+    <h2><span class="num">9</span>Randomized algorithms</h2>
+    <p>Make random choices during execution. Two families:</p>
+    <table>
+      <tr><th>Type</th><th>Correctness</th><th>Running time</th><th>Example</th></tr>
+      <tr><td><strong>Las Vegas</strong></td><td>Always correct</td><td>Random (fast on average)</td><td>Randomized quicksort</td></tr>
+      <tr><td><strong>Monte Carlo</strong></td><td>Probably correct</td><td>Fixed / bounded</td><td>Miller-Rabin primality, Monte Carlo simulation</td></tr>
+    </table>
+    <div class="callout lab">
+      <h4>In this repo</h4>
+      <p>The poker simulator and <code>tsp.py simulate</code> are <strong>Monte Carlo</strong> methods: they sample many random outcomes (hands dealt, city orders shuffled) and aggregate the results to estimate an answer rather than computing it exactly.</p>
+    </div>
+  </section>
+
+  <section id="approx">
+    <h2><span class="num">10</span>Approximation &amp; heuristics</h2>
+    <p>For NP-hard problems where the exact optimum is too expensive, settle for a solution that is <strong>provably close</strong> (approximation algorithms) or just <strong>empirically good</strong> (heuristics/metaheuristics).</p>
+    <ul>
+      <li><strong>Approximation algorithms</strong> come with a guarantee — e.g. a 2-approximation for metric TSP (build a route from a minimum spanning tree) is never worse than twice optimal.</li>
+      <li><strong>Heuristics &amp; metaheuristics</strong> have no guarantee but often work well: hill climbing, simulated annealing, genetic algorithms, ant-colony optimization.</li>
+    </ul>
+    <div class="callout lab">
+      <h4>In this repo</h4>
+      <p><code>tsp.py</code> tackles an NP-hard problem by random sampling and keeping the shortest tour found — a heuristic. "How many simulations?" is exactly the approximation trade-off: more runs → better answer, with diminishing returns.</p>
+    </div>
+  </section>
+
+  <section id="choose">
+    <h2><span class="num">★</span>How to choose a technique</h2>
+    <p>Walk these questions roughly in order:</p>
+    <ol>
+      <li>Is the input <strong>small</strong>, or do I just need a correct reference? → <strong>Brute force</strong>.</li>
+      <li>Can I cut the problem to <strong>one</strong> smaller piece each step? → <strong>Decrease &amp; conquer</strong>.</li>
+      <li>Can I split into <strong>independent</strong> pieces and combine? → <strong>Divide &amp; conquer</strong>.</li>
+      <li>Would a different <strong>representation</strong> make it easy? → <strong>Transform &amp; conquer</strong>.</li>
+      <li>Optimization where <strong>local best = global best</strong>? → <strong>Greedy</strong>.</li>
+      <li>Optimization with <strong>overlapping subproblems</strong>? → <strong>Dynamic programming</strong>.</li>
+      <li>Searching for valid <strong>configurations</strong>? → <strong>Backtracking</strong> (add bounds → <strong>branch &amp; bound</strong> for optimization).</li>
+      <li>Exact answer too costly (<strong>NP-hard</strong>)? → <strong>Randomized / approximation / heuristics</strong>.</li>
+    </ol>
+
+    <figure class="svg-wrap">
+      <svg viewBox="0 0 680 360" role="img" aria-label="Growth of common time complexities">
+        <!-- axes -->
+        <line x1="60" y1="300" x2="660" y2="300" stroke="#43506b" stroke-width="1.5"/>
+        <line x1="60" y1="300" x2="60" y2="40" stroke="#43506b" stroke-width="1.5"/>
+        <text x="360" y="335" fill="#9aa3b2" text-anchor="middle" font-size="13">input size  n  →</text>
+        <text x="22" y="170" fill="#9aa3b2" text-anchor="middle" font-size="13" transform="rotate(-90 22 170)">operations →</text>
+        <!-- curves -->
+        <polyline fill="none" stroke="#7ee0a9" stroke-width="2.5" points="60,292 660,288"/>
+        <polyline fill="none" stroke="#5b9dff" stroke-width="2.5" points="60,294 150,276 300,263 450,255 660,248"/>
+        <polyline fill="none" stroke="#c7a3ff" stroke-width="2.5" points="60,298 660,150"/>
+        <polyline fill="none" stroke="#ffd479" stroke-width="2.5" points="60,299 200,250 400,160 660,78"/>
+        <polyline fill="none" stroke="#ff9d5b" stroke-width="2.5" points="60,300 200,255 320,180 430,95 505,45"/>
+        <polyline fill="none" stroke="#ff6b6b" stroke-width="2.5" points="60,300 110,262 150,192 185,95 207,45"/>
+        <!-- labels -->
+        <text x="668" y="290" fill="#7ee0a9" font-size="13">O(1)</text>
+        <text x="668" y="250" fill="#5b9dff" font-size="13">O(log n)</text>
+        <text x="668" y="150" fill="#c7a3ff" font-size="13">O(n)</text>
+        <text x="600" y="70" fill="#ffd479" font-size="13">O(n log n)</text>
+        <text x="470" y="38" fill="#ff9d5b" font-size="13">O(n²)</text>
+        <text x="200" y="36" fill="#ff6b6b" font-size="13">O(2ⁿ)</text>
+      </svg>
+      <figcaption>Why technique choice matters: the same task at <code>O(n log n)</code> vs <code>O(2ⁿ)</code> is the difference between "instant" and "never finishes".</figcaption>
+    </figure>
+  </section>
+
+  <section id="labs">
+    <h2><span class="num">↩</span>Tie-in to this repo</h2>
+    <p>The two Coursera labs in this workspace are small but each demonstrates a technique from this page:</p>
+    <table>
+      <tr><th>Lab / file</th><th>Technique on show</th><th>What to notice</th></tr>
+      <tr><td><code>greedy-optimization/greedy_coin.py</code></td><td>Greedy</td><td>Optimal for US coins; can fail for other denominations.</td></tr>
+      <tr><td><code>greedy-optimization/tsp.py</code></td><td>Brute force → randomized / approximation</td><td>NP-hard problem solved by sampling random tours.</td></tr>
+      <tr><td><code>poker-simulator/poker.py</code></td><td>Monte Carlo simulation</td><td>Estimates outcomes by dealing many random hands.</td></tr>
+    </table>
+  </section>
+
+  <a class="nextlink" href="index.html">← Back to Part 1: <strong>Problem Framing for ML &amp; Computer Vision</strong></a>
+
+</main>
+
+<footer>
+  Algorithm Design Techniques · A visual companion to the Problem Framing page.
+</footer>
+
+</body>
+</html>

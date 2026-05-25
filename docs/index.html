@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Problem Framing for Machine Learning &amp; Computer Vision</title>
+<meta name="description" content="A guide to ML problem framing — understanding the problem, deciding if ML is right, defining the model's goal and success metrics — with a connection to computer vision problems." />
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface-2: #20242f;
+    --text: #e6e8ee;
+    --muted: #9aa3b2;
+    --accent: #5b9dff;
+    --accent-2: #7ee0a9;
+    --border: #2a2f3c;
+    --code-bg: #11141c;
+    --max: 860px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 17px;
+  }
+  .pagenav {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10; font-size: 0.9rem;
+  }
+  .pagenav a { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .pagenav a.active { color: #fff; border-color: var(--accent); background: rgba(91,157,255,0.12); }
+  .pagenav a:hover { text-decoration: none; color: var(--text); }
+  .nextlink { display:block; margin: 28px 0 0; padding: 16px 20px; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+  header.hero {
+    background: linear-gradient(135deg, #1b2436 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 24px 48px;
+    text-align: center;
+  }
+  header.hero h1 {
+    margin: 0 0 12px;
+    font-size: 2.1rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  header.hero p {
+    margin: 0 auto;
+    max-width: 620px;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  .badge {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+  }
+  main { max-width: var(--max); margin: 0 auto; padding: 0 24px 80px; }
+  nav.toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 40px 0;
+  }
+  nav.toc h2 { margin: 0 0 12px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+  nav.toc li { margin: 4px 0; break-inside: avoid; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  section { margin: 48px 0; }
+  h2 {
+    font-size: 1.5rem;
+    margin: 0 0 8px;
+    padding-top: 12px;
+    letter-spacing: -0.01em;
+  }
+  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 10px; }
+  h3 { font-size: 1.1rem; margin: 28px 0 6px; color: var(--accent-2); }
+  p { margin: 12px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; }
+  strong { color: #fff; }
+  blockquote {
+    margin: 20px 0;
+    padding: 12px 18px;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 8px 8px 0;
+    color: var(--muted);
+  }
+  .callout {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+  .callout.warn { border-color: #5c4a2a; background: #221d12; }
+  .callout.tip { border-color: #2a5c41; background: #122019; }
+  .callout h4 { margin: 0 0 6px; font-size: 0.95rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95rem;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); color: #fff; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code { background: var(--code-bg); padding: 2px 6px; border-radius: 5px; font-size: 0.88em; color: var(--accent-2); }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+  }
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.78rem; border:1px solid var(--border); background:var(--surface-2); color:var(--muted); margin-right:6px; }
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<div class="pagenav">
+  <a href="index.html" class="active">① Problem Framing</a>
+  <a href="algorithm-design.html">② Algorithm Design Techniques</a>
+</div>
+
+<header class="hero">
+  <span class="badge">ML Foundations</span>
+  <h1>Problem Framing for Machine Learning<br />&amp; Computer Vision</h1>
+  <p>Before you collect data or train a model, you frame the problem: decide whether ML is the right tool, define exactly what the model should predict, and choose how you'll measure success.</p>
+</header>
+
+<main>
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#what">What is problem framing?</a></li>
+      <li><a href="#understand">Understand the problem</a></li>
+      <li><a href="#is-ml">Is ML the right approach?</a></li>
+      <li><a href="#frame">Frame the ML problem</a></li>
+      <li><a href="#types">Types of ML problems</a></li>
+      <li><a href="#cv">Connection to Computer Vision</a></li>
+      <li><a href="#pitfalls">CV framing pitfalls</a></li>
+      <li><a href="#checklist">Framing checklist</a></li>
+    </ol>
+  </nav>
+
+  <section id="what">
+    <h2><span class="num">§</span>What is problem framing?</h2>
+    <p><strong>Problem framing</strong> is the process of analyzing a problem to isolate the individual elements that must be addressed, so you can decide whether machine learning is a viable, worthwhile approach — and if so, define precisely what the model should predict and how you'll know it worked. It happens <em>before</em> any data collection or model training.</p>
+    <p>A well-framed problem answers three questions:</p>
+    <ol>
+      <li>What is the problem, stated in <strong>non-ML terms</strong>?</li>
+      <li>Is ML the <strong>best way</strong> to solve it?</li>
+      <li>If yes, what <strong>exactly</strong> should the model predict, and how will we measure success?</li>
+    </ol>
+    <blockquote>Getting framing wrong is the most expensive mistake in an ML project: you can build a technically excellent model that solves the wrong problem, or that can never move the metric you actually care about.</blockquote>
+  </section>
+
+  <section id="understand">
+    <h2><span class="num">1</span>Understand the problem</h2>
+    <h3>State the ideal outcome — independent of the model</h3>
+    <p>Describe what you want to happen for the user or business, <strong>not</strong> what the model does. The ideal outcome should still make sense to someone who has never heard of ML.</p>
+    <ul>
+      <li>✅ <em>"Operators adjust the process before product quality drops."</em></li>
+      <li>❌ <em>"The model predicts a quality score."</em> (that's a mechanism, not an outcome)</li>
+    </ul>
+
+    <h3>Find the existing (non-ML) solution</h3>
+    <p>There is almost always a current approach — a heuristic, a rule, a human doing the task. Write it down. It becomes your <strong>baseline</strong>: it tells you how much value ML must add, and sometimes reveals that ML isn't needed at all.</p>
+
+    <h3>Confirm you actually need a prediction</h3>
+    <p>ML produces <strong>predictions</strong>. If your problem doesn't require predicting something uncertain, you probably don't need ML.</p>
+  </section>
+
+  <section id="is-ml">
+    <h2><span class="num">2</span>Is ML the right approach?</h2>
+    <p>ML is a strong fit when several of these hold:</p>
+    <table>
+      <tr><th>Use ML when…</th><th>Avoid ML when…</th></tr>
+      <tr><td>The patterns are complex and hard to express as explicit rules.</td><td>A simple heuristic or rule already works well.</td></tr>
+      <tr><td>You have (or can obtain) many relevant labeled examples.</td><td>You have little or no representative data.</td></tr>
+      <tr><td>The patterns change over time, so learning beats hand-coding.</td><td>You need fully deterministic, 100% explainable output.</td></tr>
+      <tr><td>Occasional wrong predictions are tolerable.</td><td>Any single error is unacceptable / safety-critical without guardrails.</td></tr>
+    </table>
+    <div class="callout tip">
+      <h4>Always build the dumb baseline first</h4>
+      <p>Compare any ML idea against a trivial rule (e.g. "always predict the majority class", or a fixed threshold). If the baseline is good enough, ship it — and you've saved months.</p>
+    </div>
+    <h3>Predictive vs. Generative ML</h3>
+    <p><span class="pill">Predictive</span> outputs a number or a class (price, defect / no-defect). <span class="pill">Generative</span> outputs content (a caption, a synthetic image, text). Knowing which you need shapes everything downstream.</p>
+  </section>
+
+  <section id="frame">
+    <h2><span class="num">3</span>Frame the ML problem</h2>
+
+    <h3>Define the model's goal</h3>
+    <p>Turn the ideal outcome into a single, <strong>measurable prediction</strong> the model makes. The model's goal is narrow and technical; it must clearly serve the ideal outcome.</p>
+
+    <h3>Identify the output (the label) and its type</h3>
+    <p>What does one prediction look like — a class? a number? a box? a mask? The answer determines the <a href="#types">problem type</a> and the data you need to label.</p>
+
+    <h3>Choose a proxy label when needed</h3>
+    <p>Often the ideal outcome can't be measured directly, so you predict a <strong>proxy</strong> that correlates with it.</p>
+    <div class="callout warn">
+      <h4>Proxy labels are risky</h4>
+      <p>Example: ideal = "useful video"; proxy = "watched &gt; 50%". A clickbait video can satisfy the proxy while failing the ideal. Always ask: <em>where does my proxy diverge from what I actually want?</em></p>
+    </div>
+
+    <h3>Define success metrics — distinct from model metrics</h3>
+    <table>
+      <tr><th>Model metrics</th><th>Success metrics</th></tr>
+      <tr><td>Measure the <em>model</em>: accuracy, precision, recall, AUC, mAP, MAE.</td><td>Measure whether solving the problem <em>helped</em>: scrap rate, revenue, support tickets, time saved.</td></tr>
+      <tr><td>Computed on a test set.</td><td>Computed in the real world / from business KPIs.</td></tr>
+    </table>
+    <p>A model can score 0.99 accuracy and still fail every success metric. Decide your success metrics — and the threshold that counts as "worth shipping" — <strong>before</strong> training.</p>
+  </section>
+
+  <section id="types">
+    <h2><span class="num">4</span>Types of ML problems</h2>
+    <table>
+      <tr><th>Type</th><th>Output</th><th>Example</th></tr>
+      <tr><td>Binary classification</td><td>one of two classes</td><td>spam / not spam</td></tr>
+      <tr><td>Multiclass classification</td><td>one of many classes</td><td>which species of animal</td></tr>
+      <tr><td>Regression</td><td>a continuous number</td><td>house price, temperature</td></tr>
+      <tr><td>Clustering <em>(unsupervised)</em></td><td>groups / segments</td><td>customer segmentation</td></tr>
+      <tr><td>Ranking / Recommendation</td><td>ordered list</td><td>video feed, search results</td></tr>
+      <tr><td>Generative</td><td>new content</td><td>image caption, synthetic image</td></tr>
+    </table>
+  </section>
+
+  <section id="cv">
+    <h2><span class="num">5</span>Connection to Computer Vision</h2>
+    <p>Computer vision is just ML where the input is an image (or video). The framing steps are <strong>identical</strong> — the only thing that changes is that the label is something visual. First, map the vision task to a core ML problem type:</p>
+    <table>
+      <tr><th>CV task</th><th>Underlying ML problem</th><th>Model output</th></tr>
+      <tr><td>Image classification</td><td>(multiclass) classification</td><td>one label per image</td></tr>
+      <tr><td>Object detection</td><td>classification + regression</td><td>bounding boxes + labels</td></tr>
+      <tr><td>Semantic segmentation</td><td>per-pixel classification</td><td>a class mask</td></tr>
+      <tr><td>Instance segmentation</td><td>classification + regression + mask</td><td>per-object masks</td></tr>
+      <tr><td>Anomaly / defect detection</td><td>classification (often one-class)</td><td>normal / anomalous</td></tr>
+      <tr><td>Image generation / restoration</td><td>generative</td><td>a new image</td></tr>
+    </table>
+
+    <h3>Worked example: defect detection on a production line</h3>
+    <p>Imagine a camera over a conveyor (or a froth-flotation cell, or a mineral-sorting feed). Let's frame it step by step.</p>
+    <ul>
+      <li><strong>Ideal outcome (non-ML):</strong> "Fewer defective units reach the customer" / "Operators react before product grade drops." Notice this never mentions a model.</li>
+      <li><strong>Is ML right?</strong> Defects vary in shape, texture, and lighting — hard to capture with fixed rules; and you have a continuous stream of camera frames = data. ML fits. <em>Baseline:</em> a simple brightness/edge threshold or periodic manual inspection.</li>
+      <li><strong>Model's goal:</strong> predict, per frame, whether a defect is present — and <em>where</em>, if you need to act on its location.</li>
+      <li><strong>Output &amp; type:</strong> binary classification (<code>defect</code> / <code>ok</code>) if "is it bad?" is enough; <strong>object detection</strong> (boxes) if you must localize; <strong>segmentation</strong> if you must measure defect area.</li>
+      <li><strong>Proxy label:</strong> "defective" is defined by QA inspectors, so labels are subjective and expensive, and true defects are rare. That framing decision drives your whole data strategy.</li>
+      <li><strong>Model metric vs success metric:</strong> model = recall / precision / mAP; success = "scrap rate reduced 15%", "fewer customer returns". Track both — they can disagree.</li>
+    </ul>
+    <div class="callout warn">
+      <h4>The accuracy trap in CV</h4>
+      <p>If 99% of units are fine, a model that <em>always</em> says "ok" scores 99% accuracy and delivers zero value. With rare-defect problems, frame success around <strong>recall</strong> and <strong>precision</strong> (or PR-AUC), never raw accuracy.</p>
+    </div>
+  </section>
+
+  <section id="pitfalls">
+    <h2><span class="num">6</span>CV-specific framing pitfalls</h2>
+    <ul>
+      <li><strong>Class imbalance:</strong> defects/events are rare → accuracy lies. Use recall, precision, PR-AUC, and decide which error (false alarm vs. miss) costs more.</li>
+      <li><strong>Label quality &amp; ambiguity:</strong> who defines the ground truth, and do two annotators agree? Fuzzy labels cap your ceiling.</li>
+      <li><strong>Domain shift:</strong> a new camera, lighting change, or product variant silently breaks a model trained on old conditions — plan for monitoring and retraining.</li>
+      <li><strong>Localization vs. classification:</strong> "is there a defect?" (cheap labels) is a very different problem from "where is it?" (expensive boxes/masks). Don't over-scope.</li>
+      <li><strong>Annotation cost:</strong> bounding boxes and pixel masks are far more expensive to label than image-level tags — factor this into feasibility.</li>
+    </ul>
+  </section>
+
+  <section id="checklist">
+    <h2><span class="num">✓</span>One-page framing checklist</h2>
+    <div class="callout">
+      <ol>
+        <li>Stated the <strong>ideal outcome</strong> with no mention of a model?</li>
+        <li>Identified the current <strong>non-ML baseline</strong>?</li>
+        <li>Confirmed the problem needs a <strong>prediction</strong>, and that ML beats the baseline?</li>
+        <li>Defined a single, measurable <strong>model goal</strong> tied to the outcome?</li>
+        <li>Named the <strong>output / label</strong> and its problem type?</li>
+        <li>If using a <strong>proxy label</strong>, written down where it can diverge?</li>
+        <li>Chosen <strong>success metrics</strong> separate from model metrics, with a "ship it" threshold?</li>
+        <li>(CV) Picked metrics that survive <strong>class imbalance</strong>?</li>
+      </ol>
+    </div>
+  </section>
+
+  <hr />
+  <p style="color:var(--muted);font-size:0.92rem;">This page summarizes and builds on Google's <a href="https://developers.google.com/machine-learning/problem-framing/problem-framing" target="_blank" rel="noopener">ML Problem Framing</a> guide, adding a connection to machine learning and computer vision problems.</p>
+
+  <a class="nextlink" href="algorithm-design.html">Next → Part 2: <strong>Algorithm Design Techniques</strong> (brute force, divide &amp; conquer, greedy, DP, backtracking, and more — with diagrams)</a>
+
+</main>
+
+<footer>
+  Problem Framing for ML &amp; Computer Vision · Adapted from
+  <a href="https://developers.google.com/machine-learning/problem-framing/problem-framing" target="_blank" rel="noopener">Google's ML Problem Framing</a> guide.
+</footer>
+
+</body>
+</html>
