@@ -1,5 +1,7 @@
 # Problem Framing & Algorithm Design — GitHub Pages site
 
+https://italosalgado14.github.io/simulation-mlpos-coursera-chapter/
+
 A small two-page static site:
 
 1. **Problem Framing for ML & Computer Vision** — understanding the problem,
